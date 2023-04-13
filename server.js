@@ -7,6 +7,11 @@ const CONFIG = require("./config/config");
 
 const PORT = CONFIG.PORT || 5000;
 
+// database connection
+const DbConnection = require("./db/dbConnection");
+
+DbConnection();
+
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
