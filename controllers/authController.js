@@ -6,7 +6,8 @@ const CONFIG = require("../config/config");
 exports.signup = async function (req, res, next) {
   try {
     // Get user input
-    const { email, password, firstName, lastName, phoneNumber } = req.body;
+    const { email, password, firstName, lastName, phoneNumber, isAdmin } =
+      req.body;
 
     // Validate user input
     if (!(email || password || firstName || lastName || phoneNumber)) {
@@ -17,7 +18,7 @@ exports.signup = async function (req, res, next) {
 
     // check if user already exist
     // Validate if user exist in our database
-    const oldUser = await User.findOne({ email: email });
+    const oldUser = await User.findOne({ phoneNumber: phoneNumber });
 
     if (oldUser) {
       return res
@@ -25,7 +26,17 @@ exports.signup = async function (req, res, next) {
         .json({ status: "fail", message: "User already exists" });
     }
 
-    const user = await User.create(req.body);
+    const accountNumber = Math.floor(Math.random() * 10000000000);
+
+    const user = await User.create({
+      email: email,
+      password: password,
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+      accountNumber: accountNumber,
+      isAdmin: isAdmin,
+    });
     res
       .status(201)
       // omit the password and password confirm
@@ -47,14 +58,18 @@ exports.login = async function (req, res, next) {
         .json({ status: "fail", message: "All input is required" });
     }
     // Validate if user exist in our database
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ phoneNumber: phoneNumber });
 
     const validPassword = await user.comparePassword(password);
     if (validPassword) {
       // Create token
-      const token = jwt.sign({ id: user._id, email: email }, CONFIG.TOKEN_KEY, {
-        expiresIn: "2h",
-      });
+      const token = jwt.sign(
+        { id: user._id, phoneNumber: phoneNumber },
+        CONFIG.SECRET_KEY,
+        {
+          expiresIn: "2h",
+        }
+      );
       // save user token
       user.token = token;
       res.status(200).json({ token: token });

@@ -4,6 +4,7 @@ const express = require("express");
 // Require files
 const CONFIG = require("./config/config");
 const userRouter = require("./routes/authRoute");
+const loanRouter = require("./routes/loanRoute");
 
 // instantialize packages
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1", userRouter);
+app.use("/api/v1", loanRouter);
 
 module.exports = app;
