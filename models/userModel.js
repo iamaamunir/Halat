@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -23,6 +25,8 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
+    unique: true,
+    required: [true, "Please fill in your phone number"],
   },
   isAdmin: {
     type: Boolean,
@@ -50,7 +54,7 @@ const userSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
   },
-  nextPaymentDate: {
+  paymentDeadline: {
     type: Date,
   },
 });
